@@ -8,8 +8,15 @@ Simple sashimi-plot like isoform visualizer for long-read sequencing.
     - Allows multiple TSSs on same figure and can compare isoforms from different TSSs.
 - Plots all isoforms in the given regions.
 
-## Usage
+## Requirement
+
+- Python3 (3.7.6) 
+
+## Installation
 
 ```
 git clone https://github.com/isihya/long_read_isoform_visualizer.git
 ```
+
+## Usage
+
