@@ -215,13 +215,13 @@ def visualize_cumulative_sum():
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("input", help="please set me", type=str)
-    parser.add_argument("ref", help="please set me", type=str)
-    parser.add_argument("--cage", help="optional", type=str)
-    parser.add_argument("--tss_t", help="optional",type=int, default=40)
-    parser.add_argument("--ss_t", help="optional", type=int, default=20)
-    parser.add_argument("--ss3end_t", help="optional", type=int, default=50)
-    parser.add_argument("--xlimit", help="optional", type=int, default=100)
+    parser.add_argument("input", help="input path for *.bed file", type=str)
+    parser.add_argument("ref", help="reference path for gtf or genepred format file", type=str)
+    parser.add_argument("--cage", help="optional: path for *.bed cage peaks file", type=str)
+    parser.add_argument("--tss_t", help="optional: a threshold for tss correction",type=int, default=40)
+    parser.add_argument("--ss_t", help="optional: a threshold for splice site correction", type=int, default=20)
+    parser.add_argument("--ss3end_t", help="optional: a threshold for 3'end correction", type=int, default=50)
+    parser.add_argument("--xlimit", help="optional: right boundary value for visualization of minimum distance from given elements to annotated values", type=int, default=100)
     args = parser.parse_args()
     return args
 

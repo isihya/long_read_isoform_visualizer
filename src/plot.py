@@ -211,12 +211,12 @@ def print_all():
 
 def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("input", help="please set me", type=str)
-    parser.add_argument("chrm", help="please set me", type=str)
-    parser.add_argument("--tss", help="option", type=str)
-    parser.add_argument("--cellname", help="option", type=str, default="")
-    parser.add_argument("--xliml", help="option", type=int)
-    parser.add_argument("--xlimr", help="option", type=int)
+    parser.add_argument("input", help="path for *.corrected file", type=str)
+    parser.add_argument("chrm", help="chromosome. set 'chrN' (N=1,...,22,X,Y)", type=str)
+    parser.add_argument("--tss", help="optional: coordinate of tss which you want to extract by", type=str)
+    parser.add_argument("--cellname", help="optional: you can add cellname on figure", type=str, default="")
+    parser.add_argument("--xliml", help="optional: left boundary value for visualization ", type=int)
+    parser.add_argument("--xlimr", help="optional: right blundary value for visualization", type=int)
     args = parser.parse_args()
     return args
 
