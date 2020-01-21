@@ -29,6 +29,8 @@ git clone https://github.com/isihya/long_read_isoform_visualizer.git
 ```
 
 ## Usage
+First, please conduct correction by reference files.
+
 ```
 usage: correction.py [-h] [--cage CAGE] [--tss_t TSS_T] [--ss_t SS_T]
                      [--ss3end_t SS3END_T] [--xlimit XLIMIT]
@@ -47,4 +49,24 @@ optional arguments:
   --xlimit XLIMIT      optional: right boundary value for visualization of
                        minimum distance from given elements to annotated
                        values
+```
+
+Then, you can plot isoforms.
+
+```
+usage: plot.py [-h] [--tss TSS] [--cellname CELLNAME] [--xliml XLIML]
+               [--xlimr XLIMR]
+               input chrm
+
+positional arguments:
+  input                path for *.corrected file
+  chrm                 chromosome. set 'chrN' (N=1,...,22,X,Y)
+
+optional arguments:
+  -h, --help           show this help message and exit
+  --tss TSS            optional: coordinate of tss which you want to extract
+                       by
+  --cellname CELLNAME  optional: you can add cellname on figure
+  --xliml XLIML        optional: left boundary value for visualization
+  --xlimr XLIMR        optional: right blundary value for visualization
 ```
