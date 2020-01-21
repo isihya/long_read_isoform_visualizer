@@ -26,7 +26,7 @@ def input(INPUT_PATH):
     reads = f.readlines()
     return reads
 
-def preprocess(reads,TARGET_TSS):
+def preprocess_from_TSS(reads,TARGET_TSS):
     field = Counter()
     for read in reads:
         read = read.rstrip("\n").split("\t")
@@ -46,6 +46,27 @@ def preprocess(reads,TARGET_TSS):
                 field.update([",".join([ss[i],ss[i+1],str(flag%2)])])
                 flag += 1
     return field
+
+
+def preprocess_from_Region(reads,xliml,xlimr):
+    field = Counter()
+    for read in reads:
+        read = read.rstrip("\n").split("\t")
+        if(read[0]!=args.chrm):
+            continue
+        read = read[1:]
+        ss = read[1:]
+        ss.sort()
+        if int(ss[0]) > xlimr or int(ss[-1]) < xliml :
+            continue
+        flag = 0
+        for i in range(len(ss)-1):
+            #print([ss[i],ss[i+1],str(flag%2)])
+            field.update([",".join([ss[i],ss[i+1],str(flag%2)])])
+            flag += 1
+    return field
+
+
 
 def make_name_to_read_end_dict(INPUT_PATH):
     reads = bed.read(INPUT_PATH)
@@ -86,6 +107,9 @@ def calculate_height(field,TARGET_TSS,color,offset,ax):
         for j in range(len(sslist)-1):
             if(j<i):
                 continue
+            if args.xliml!=None and args.xlimr!=None:
+                if args.xliml>sslist[i] or args.xlimr<sslist[j]:
+                    continue
             width=sslist[j]-sslist[i]
             ## splice sitesをつなぐ線
             x = np.array([sslist[i],sslist[i]+(sslist[j]-sslist[i])/2,sslist[j]])
@@ -113,11 +137,14 @@ def calculate_height(field,TARGET_TSS,color,offset,ax):
     ax.ticklabel_format(style='sci',axis='x',scilimits=(0,0))
     #plt.title('All isoforms transcribed from chr'+str(chrm)+": "+str(TARGET_TSS)+", cell line: "+args.cellname)
     #cell-lineは図のcaptionにつけることにする
-    plt.title('All isoforms transcribed from '+str(args.chrm)+", "+str(TARGET_TSS))
+    if TARGET_TSS != "":
+        plt.title('All isoforms transcribed from '+str(args.chrm)+", "+str(TARGET_TSS))
+    else:
+        plt.title('All isoforms from '+str(args.chrm)+": "+str(args.xliml)+" to "+str(args.xlimr))
     plt.ylabel('Count of reads')
-    if hasattr(args,"xliml") and hasattr(args,"xlimr"):
+    if args.xliml!=None and args.xlimr!=None :
         plt.xlim([args.xliml,args.xlimr])
-    elif hasattr(args,"xliml")==0 and hasattr(args,"xlimr")==0:
+    elif args.xliml==None and args.xlimr==None:
         pass
     else:
         raise "please set xliml and xlimr together"
@@ -150,29 +177,43 @@ def make_color():
     return palette
 
 def print_all():
-    for i in range(len(TARGET_TSSs)):
-        print(str(i+1)+" of "+ str(len(TARGET_TSSs)) + " TSS processing")
-        offset = [-1]
-        TARGET_TSS = int(TARGET_TSSs[i])
-        field = preprocess(reads,TARGET_TSS)
-        ax = plt.subplot(len(TARGET_TSSs),1,i+1)
-        ax = calculate_height(field,TARGET_TSS,"skyblue",offset,ax)
-        if(i==len(TARGET_TSSs)-1):
-            ax.set_xlabel('Coordinates on hg38')
-        else:
-            ax.tick_params(labelbottom=False)
+    offset = [-1]
+    if args.tss!=None:
+        for i in range(len(TARGET_TSSs)):
+            print(str(i+1)+" of "+ str(len(TARGET_TSSs)) + " TSS processing")
+            TARGET_TSS = int(TARGET_TSSs[i])
+            TARGET_TSS = int(TARGET_TSSs[i])
+            field = preprocess_from_TSS(reads,TARGET_TSS)
+            ax = plt.subplot(len(TARGET_TSSs),1,i+1)
+            ax = calculate_height(field,TARGET_TSS,"skyblue",offset,ax)
+            if(i==len(TARGET_TSSs)-1):
+                ax.set_xlabel('Coordinates on hg38')
+            else:
+                ax.tick_params(labelbottom=False)
+    else:
+        field = preprocess_from_Region(reads,args.xliml,args.xlimr)
+        fig = plt.figure(figsize=(8.0, 4.0))
+        ax = fig.add_subplot(111)
+        ax = calculate_height(field,"","skyblue",offset,ax)
+        ax.set_xlabel('Coordinates on hg38')
     plt.subplots_adjust(hspace=0.5)
     #plt.tight_layout()
     if len(args.cellname) > 0:
-        plt.savefig(args.cellname+",TSS:"+str(TARGET_TSS)+".png",dpi=500, bbox_inches="tight")
+        cellnameoffset=args.cellname+","
     else:
-        plt.savefig("TSS:"+str(TARGET_TSS)+".png",dpi=500, bbox_inches="tight")
+        cellnameoffset=""
+    if args.tss!=None:
+        plt.savefig("longread_isoforms_"+cellnameoffset+"TSS:"+str(TARGET_TSS)+".png",dpi=500, bbox_inches="tight")
+    else:
+        plt.savefig("longread_isoforms_"+cellnameoffset+"Region:"+str(args.xliml)+"-"+str(args.xlimr)+".png",dpi=500, bbox_inches="tight")
+
+
 
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("input", help="please set me", type=str)
     parser.add_argument("chrm", help="please set me", type=str)
-    parser.add_argument("tss", help="please set me", type=str)
+    parser.add_argument("--tss", help="option", type=str)
     parser.add_argument("--cellname", help="option", type=str, default="")
     parser.add_argument("--xliml", help="option", type=int)
     parser.add_argument("--xlimr", help="option", type=int)
@@ -182,8 +223,11 @@ def get_args():
 if __name__ == "__main__":
     args = get_args()
     print(args.input)
+    if args.tss==None and (args.xliml==None and args.xlimr==None):
+        raise "please set tss or {xlim,xlimr}"
     plt.rcParams["font.size"] = 13
-    TARGET_TSSs=args.tss.split(",")
+    if args.tss is not None:
+        TARGET_TSSs=args.tss.split(",")
     reads = input(args.input)
     palette = make_color()
     print_all()
