@@ -12,6 +12,16 @@ Simple sashimi-plot like isoform visualizer for long-read sequencing.
 
 - Python3 (3.7.6) 
 
+## Reference files
+We checked performance using following reference files.
+
+- FANTOM5 CAGE peaks
+    - http://fantom.gsc.riken.jp/5/datafiles/reprocessed/hg38_latest/extra/CAGE_peaks/
+- GENCODE annotation files (We used ver 30)
+    - https://www.gencodegenes.org/human/
+- RefSeq
+    - http://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/
+
 ## Installation
 
 ```
