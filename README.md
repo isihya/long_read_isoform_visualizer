@@ -1,7 +1,7 @@
 # long_read_isoform_visualizer
 Simple sashimi-plot like isoform visualizer for long-read sequencing.
 
-![sample](https://github.com/isihya/long_read_isoform_visualizer/blob/master/asset/TSS:15758794.png)
+<img src="https://github.com/isihya/long_read_isoform_visualizer/blob/master/asset/TSS:15758794.png" width="500">
 
 ## Features
 - Plots isoforms from full-length transcripts genereted by long-read sequencer such as ONT MinION and PacBio.
